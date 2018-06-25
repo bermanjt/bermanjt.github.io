@@ -115,7 +115,7 @@
         ctx.fillStyle = tile.getForegroundColor();
         ctx.fillText(tile.name, x + textMargin, 80);
         // Expire outdated people (30 days)
-        var ptoText = "3";
+        var ptoText = "4";
         if (!tile.isExpired()) {
           var yearsSinceStart = ((Date.now() - tile.startdate) / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0);
           var hours = tile.currentPTOHours();
@@ -145,6 +145,8 @@
       var currentDay = currentDate.getDate();
       var currentMonth = currentDate.getMonth();
       var currentHour = currentDate.getHours();
+      var currentMinute = currentDate.getMinutes();
+      var startDay = hiredate.getDate();
       if(hiredate == null){
         // Guess
         if(rate == 16)
