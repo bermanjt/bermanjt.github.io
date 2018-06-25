@@ -141,17 +141,6 @@
       this.startdate = startdate;
       this.lastupdate = lastupdate;
       this.hiredate = hiredate;
-      var currentDate = new Date();
-      var currentDay = currentDate.getDate();
-      var currentMonth = currentDate.getMonth();
-      var currentHour = currentDate.getHours();
-      var currentMinute = currentDate.getMinutes();
-      var startDay = hiredate.getDate();
-      var startMonth = hiredate.getMonth();
-      var monthsUntil = startMonth - currentMonth;
-      var daysUntil = startDay - currentDay;
-      var hoursUntil = 24- currentHour;
-      var minutesUntil = 60 - currentMinute;
       
       if(hiredate == null){
         // Guess
