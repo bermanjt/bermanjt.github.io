@@ -198,7 +198,7 @@
             ptoAccum += (yearsAtPreviousRate * previousRate.ptoDaysPerYear * 8);
             var yearsAtCurrentRate = ((Date.now() - rate.startdate) / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0);
             ptoAccum += (yearsAtCurrentRate * rate.ptoDaysPerYear * 8);
-            return until;
+            return this.pto + (yearsSinceStart * this.currentAccrualRate() * 8);
           }
         }
         // Old Way
