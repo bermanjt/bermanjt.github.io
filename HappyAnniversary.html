@@ -38,26 +38,26 @@
 <body>
   <script>
     // settings
-    var scrollSpeed = 0.2; // px per ms
-    var tileWidth = 800;
+    var scrollSpeed = 0.5; // px per ms
+    var tileWidth = 2650;
     var tileHeight = 200;
     var textMargin = 5;
     var tiles = [];
     //tiles.push(new Employee("Andrew Hoyt", "#333f4f", "#ffff00", 19, 11.92, new Date("2016-12-26"), new Date("2017-09-01"), null));
-    //tiles.push(new Employee("Andy Knapp", "black", "green", 24, 192.11, new Date("2016-12-26"), new Date("2017-09-08"), new Date('2007-08-01')));
+    tiles.push(new Employee("Andy Knapp", "black", "green", 24, 192.11, new Date("2016-12-26"), new Date("2017-09-08"), new Date('2007-08-01')));
     tiles.push(new Employee("Chris Mikola", "#8E44AD", "white", 24, -109.96, new Date("2016-12-26"), new Date("2017-11-20"), new Date("2004-08-01")));
     //tiles.push(new Employee("Derek Lauer", "gray", "blue", 16, -56.1, new Date("2016-12-26"), new Date("2017-09-05"), null));
     tiles.push(new Employee("Jason Farlow", "black", "green", 19, 54.78, new Date("2018-01-01"), new Date("2018-01-03"), new Date("2010-09-07")));
-    tiles.push(new Employee("Jason Hotra", "#016533", "white", 24, 55.75, new Date("2016-12-26"), new Date("2017-11-13"), null));
+    //tiles.push(new Employee("Jason Hotra", "#016533", "white", 24, 55.75, new Date("2016-12-26"), new Date("2017-11-13"), null));
     tiles.push(new Employee("John L. Gettel", nyan, "#708090", 24, -47.89, new Date("2016-12-26"), new Date("2017-11-20"), new Date("1995-02-15")));
     tiles.push(new Employee("Ken T", "grey", "black", 24, 181.25, new Date("2016-12-26"), new Date("2017-09-29"), new Date("2001-04-30")));
-    //tiles.push(new Employee("Kevin Chaney", "Turquoise", "black", 17, -63.9, new Date("2016-12-26"), new Date("2017-09-05"), new Date('2014-07-07')));
+    tiles.push(new Employee("Kevin Chaney", "Turquoise", "black", 17, -63.9, new Date("2016-12-26"), new Date("2017-09-05"), new Date('2014-07-07')));
     //tiles.push(new Employee("Michelle", "pink", "gray", 24, 81.2400, new Date("2017-07-07"), new Date("2017-08-01"), null));
     //tiles.push(new Employee("Mike Legg", "red", "white", 24, 239.57, new Date("2017-07-05"), new Date("2017-08-01"), null));
     tiles.push(new Employee("Ryan Mathewson", "black", nyan, 19, 95.7, new Date("2016-12-26"), new Date("2017-12-19"), new Date('2008-06-02')));
     tiles.push(new Employee("Scott Lawless", "#92278F", "#FFFFFF", 24, 256.33, new Date("2016-12-26"), new Date("2017-10-03"), new Date("2003-06-23")));
-    //tiles.push(new Employee("Taylor Osmonson", "black", "orange", 19, -75.9, new Date("2016-12-26"), new Date("2017-09-08"), new Date('2013-07-01')));
-    tiles.push(new Employee("Co-ops", "black", "white", 0, 0, new Date("2017-06-23"), new Date("2020-08-04")));
+    tiles.push(new Employee("Taylor Osmonson", "black", "orange", 19, -75.9, new Date("2016-12-26"), new Date("2017-09-08"), new Date('2013-07-01')));
+    //tiles.push(new Employee("Co-ops", "black", "white", 0, 0, new Date("2017-06-23"), new Date("2020-08-04"), null));
     var sitesToRotate = ["https://systemssupport.leidos.com/",
                          "https://systemssupport.leidos.com/CalendarPage.aspx",
                          "https://app.powerbi.com/view?r=eyJrIjoiYzEyODFiZTMtOTM0MC00Njk0LTk5MzAtMWM4MzRhM2Q4OTIzIiwidCI6IjZhOTg0M2Y0LTk3ZDgtNDZlMi1iODQzLTJjNWUyNWJiNzE5YiIsImMiOjR9",
@@ -100,7 +100,7 @@
         leftMostTileIndex++;
       }
       leftMostTileIndex = leftMostTileIndex % tiles.length
-      tiles.sort(function (a, b) { return b.currentPTOHours() - a.currentPTOHours(); });
+      
       // Draw
       ctx.clearRect(0, 0, canvas.width, canvas.height);
       var x = leftEdge;
@@ -115,16 +115,8 @@
         ctx.fillStyle = tile.getForegroundColor();
         ctx.fillText(tile.name, x + textMargin, 80);
         // Expire outdated people (30 days)
-        var ptoText = "5";
-        if (!tile.isExpired()) {
-          var yearsSinceStart = ((Date.now() - tile.startdate) / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0);
-          var hours = tile.currentPTOHours();
-          var minutes = (hours % 1) * 60.0;
-          var seconds = (minutes % 1) * 60.0;
-          var milliseconds = (seconds % 1) * 1000;
-          ptoText = Math.floor(hours) + ":" + ("00" + Math.floor(minutes)).substr(-2, 2) + ":" + ("00" + Math.floor(seconds)).substr(-2, 2) + "." + ("000" + Math.floor(milliseconds)).substr(-3, 3);
-        }
-        ctx.fillText(ptoText, x + textMargin, 180);
+        var Text = tile.anniversary();
+        ctx.fillText(Text, x + textMargin, 180);
         x += tileWidth;
         i++;
       }
@@ -133,31 +125,72 @@
     }
     requestAnimationFrame(Draw);
     function Employee(name, background, foreground, rate, pto, startdate, lastupdate, hiredate) {
-      this.name = name;
-      this.background = background;
-      this.foreground = foreground;
-      //this.rate = rate;
-      this.pto = pto;
-      this.startdate = startdate;
-      this.lastupdate = lastupdate;
-      this.hiredate = hiredate;
-      var currentDate = new Date();
-      var currentDay = currentDate.getDate();
-      var currentMonth = currentDate.getMonth();
-      var currentHour = currentDate.getHours();
-      var currentMinute = currentDate.getMinutes();
-      var startDay = hiredate.getDate();
-      if(hiredate == null){
-        // Guess
-        if(rate == 16)
-          this.hiredate = new Date().setFullYear(2016);
-        else if (rate == 17)
-          this.hiredate = new Date().setFullYear(2015);
-        else if (rate == 19)
-          this.hiredate = new Date().setFullYear(2011);
-        else
-          this.hiredate = new Date().setFullYear(2000);
-      }
+    this.name = name;
+    this.background = background;
+    this.foreground = foreground;
+    //this.rate = rate;
+    this.pto = pto;
+    this.startdate = startdate;
+    this.lastupdate = lastupdate;
+    this.hiredate = hiredate;
+    this.anniversary = function() {
+		var currentDate = new Date();
+		var currentDay = currentDate.getDate();
+		var currentMonth = currentDate.getMonth();
+		var currentHour = currentDate.getHours();
+		var currentMinute = currentDate.getMinutes();
+		var startDay = hiredate.getDate();
+		var startMonth = hiredate.getMonth();
+		var monthsUntil = startMonth - currentMonth;
+		var daysUntil = startDay - currentDay;
+		var hoursUntil = 24 - currentHour;
+		var minutesUntil = 60 - currentMinute;
+		var year = hiredate.getFullYear();
+		var currentYear = currentDate.getFullYear();
+		var numberOfYears = currentYear - year;
+		var suffix = "th";
+		if(currentMonth >= startMonth){
+			if(currentDay >= startDay){
+				numberOfYears = numberOfYears + 1;
+			}
+		}
+		if(monthsUntil < 0){
+			monthsUntil = monthsUntil + 12;
+		}
+		if(daysUntil < 0){
+			if(currentMonth == 3 || currentMonth == 5 || currentMonth == 8 || currentMonth == 10){
+			daysUntil = daysUntil + 30;
+			monthsUntil = monthsUntil - 1;
+			}
+			else if(currentMonth == 1){
+			daysUntil = daysUntil + 28;
+			monthsUntil = monthsUntil - 1;
+			}
+			else{
+			daysUntil = daysUntil + 31;
+			monthsUntil = monthsUntil - 1;
+			}
+		}
+		if (monthsUntil < 0){
+			monthsUntil = 11;
+		}
+		if(numberOfYears < 4){
+			if(numberOfYears = 3){
+				suffix = "rd";
+			}
+			else if(numberOfYears = 2){
+				suffix = "nd";
+			}
+			else if(numberOfYears = 1){
+				suffix = "st";
+			}
+			else{
+				suffix = "th";
+			}
+		}
+		var until = monthsUntil + " months " + daysUntil + " days " + hoursUntil + " hours " + minutesUntil + " minutes until your " + numberOfYears + suffix + " anniversary!" 
+		return until;
+	}	
       this.isExpired = function() {
         return new Date() > this.lastupdate.addDays(30)
       }
@@ -181,28 +214,9 @@
             return ptoAccum;
           }
         }
-        // Old Way
-        var yearsSinceStart = ((Date.now() - this.startdate) / 1000.0 / 60.0 / 60.0 / 24.0 / 365.0);
-        return this.pto + (yearsSinceStart * this.currentAccrualRate() * 8);
       }
-      this.getAccrualRates = function (){
-        var start = new Date(this.hiredate);
-        return [
-          {"startdate": new Date(start), "ptoDaysPerYear": 16},
-          {"startdate": new Date(start.setFullYear(start.getFullYear() + 2)), "ptoDaysPerYear": 17},
-          {"startdate": new Date(start.setFullYear(start.getFullYear() + 2)), "ptoDaysPerYear": 19},
-          {"startdate": new Date(start.setFullYear(start.getFullYear() + 6)), "ptoDaysPerYear": 24},
-        ];
-      }
-      this.currentAccrualRate = function(){
-        var now = new Date();
-        var rates = this.getAccrualRates();
-        for(var i = 1; i < rates.length; i++){
-          if(rates[i].startdate > now)
-            return rates[i-1].ptoDaysPerYear;
-        }
-        return rates[rates.length - 1].ptoDaysPerYear;
-      }
+      
+      
       this.getBackgroundColor = function () {
         if (typeof background === "function")
           return background();
